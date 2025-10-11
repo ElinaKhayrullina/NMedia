@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/common_spacing"
+    android:layout_margin="@dimen/common_spacing"
     tools:context=".MainActivity">
 
     <ImageView
@@ -17,7 +17,7 @@
         app:layout_constraintBottom_toBottomOf="@id/barrier"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@sample/post.json/data/authorAvatar" />
+        app:srcCompat="@drawable/ic_netology_original_48dp" />
 
     <TextView
         android:id="@+id/author"
@@ -54,6 +54,7 @@
         android:layout_marginBottom="@dimen/common_spacing"
         android:background="@android:color/transparent"
         android:contentDescription="@string/description_post_menu"
+        android:autoLink="all"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_more_vert_24" />
@@ -106,22 +107,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="232dp"
+        android:layout_marginStart="8dp"
         android:background="@android:color/transparent"
         android:contentDescription="@string/description_share"
         app:tint="@android:color/darker_gray"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/count_of_likes"
         app:layout_constraintTop_toBottomOf="@+id/content"
         app:srcCompat="@drawable/share" />
 
     <TextView
         android:id="@+id/count_of_share"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="36dp"
         android:layout_marginTop="8dp"
         android:ellipsize="end"
-        android:maxLines="1"
         android:singleLine="true"
         android:text="@{viewModel.formattedLikes}"
         app:layout_constraintStart_toEndOf="@+id/share"
