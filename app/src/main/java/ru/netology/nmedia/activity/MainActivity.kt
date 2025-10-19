@@ -6,8 +6,10 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import ru.netology.nmedia.viewmodel.PostViewModel
 import ru.netology.nmedia.R
+import ru.netology.nmedia.adapter.PostAdapter
 import ru.netology.nmedia.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -30,55 +32,20 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        viewModel.get().observe(this) { post ->
-            with(binding) {
-                author.text = post.author
-                published.text = post.published
-                content.text = post.content
-                countOfLikes.text = formatNumbers(post.countOfLikes)
-                countOfShare.text = formatNumbers(post.countOfShare)
-                countOfVisibility.text = formatNumbers(post.countOfVisibility)
-                if (post.likedByMe) {
-                    favorite.setImageResource(R.drawable.baseline_favourite_24)
-                } else {
-                    favorite.setImageResource(R.drawable.baseline_favorite_border_24)
-                }
+        val adapter = PostAdapter(
+            likeClickListener = { post ->
+                viewModel.likedById(post.id)
+            },
+            shareClickListener = { post ->
+                viewModel.shareById(post.id)
             }
-        }
+        )
 
-        with(binding) {
-            favorite.setOnClickListener {
-                viewModel.like()
-            }
-            share.setOnClickListener {
-                viewModel.share()
-            }
-        }
-    }
+        binding.container.layoutManager = LinearLayoutManager(this)
+        binding.container.adapter = adapter
 
-    private fun formatNumbers(count: Int): String {
-        return when {
-            count < 10000 -> {
-                if (count < 1000) {
-                    count.toString()
-                } else {
-                    if (((count % 1000) / 100) > 0) {
-                        "${count / 1000}.${(count % 1000) / 100}"
-                    } else {
-                        "${count / 1000}K"
-                    }
-                }
-            }
-            count < 1000000 -> {
-                "${count / 1000}K"
-            }
-            else -> {
-                if (((count % 1000000) / 100000) > 0) {
-                    "${count / 1000000}.${(count % 1000000) / 100000}M"
-                } else {
-                    "${count / 1000000}M"
-                }
-            }
+        viewModel.get().observe(this) { posts ->
+            adapter.submitList(posts)
         }
     }
 }
