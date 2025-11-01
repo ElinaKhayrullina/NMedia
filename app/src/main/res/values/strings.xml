@@ -6,4 +6,7 @@
     <string name="description_favorites">Favorites</string>
     <string name="description_visibility">Visibility</string>
     <string name="description_share">Share</string>
+    <string name="remove">Remove</string>
+    <string name="post_content_hint">Post content</string>
+    <string name="edit">Edit</string>
 </resources>

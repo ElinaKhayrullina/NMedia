@@ -7,4 +7,7 @@
     <string name="description_favorites">Лайки/Избранное</string>
     <string name="description_visibility">Просмотры</string>
     <string name="description_share">Репосты</string>
+    <string name="remove">Удаление</string>
+    <string name="post_content_hint">Поле ввода для контента</string>
+    <string name="edit">Редактирование</string>
 </resources>
