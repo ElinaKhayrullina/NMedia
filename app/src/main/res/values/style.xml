@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Widget.AppTheme.MenuButton" parent="Widget.Material3.Button.IconButton">
+        <item name="iconTint">?attr/colorControlNormal</item>
+    </style>
+
+    <style name="Widget.App.LikeCheckBox" parent="Widget.Material3.CompoundButton.CheckBox">
+        <item name="buttonTint">@color/color_like</item>
+    </style>
+
+    <style name="Widget.App.LikeButton" parent="Widget.Material3.Button.TextButton.Icon">
+        <item name="iconTint">@color/color_like</item>
+    </style>
+</resources>
