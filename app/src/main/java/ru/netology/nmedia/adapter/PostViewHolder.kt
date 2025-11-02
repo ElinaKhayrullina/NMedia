@@ -19,20 +19,16 @@ class PostViewHolder(
             content.text = post.content
 
             if (post.countOfLikes > 0) {
-                countOfLikes.text = formatNumbers(post.countOfLikes)
-                countOfLikes.visibility = View.VISIBLE
+                favorite.text = formatNumbers(post.countOfLikes)
             } else {
-                countOfLikes.visibility = View.GONE
+                favorite.text = ""
             }
+            favorite.visibility = View.VISIBLE
 
-            countOfShare.text = formatNumbers(post.countOfShare)
+            share.text = formatNumbers(post.countOfShare)
             countOfVisibility.text = formatNumbers(post.countOfVisibility)
 
-            if (post.likedByMe) {
-                favorite.setImageResource(R.drawable.baseline_favourite_24)
-            } else {
-                favorite.setImageResource(R.drawable.baseline_favorite_border_24)
-            }
+            favorite.isChecked = post.likedByMe
 
             favorite.setOnClickListener {
                 listener.likedById(post)
@@ -63,7 +59,6 @@ class PostViewHolder(
                 }.show()
             }
         }
-
     }
 
     private fun formatNumbers(count: Int): String {
