@@ -1,9 +1,11 @@
 package ru.netology.nmedia.activity
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -15,10 +17,12 @@ import ru.netology.nmedia.adapter.PostAdapter
 import ru.netology.nmedia.adapter.PostListener
 import ru.netology.nmedia.databinding.ActivityMainBinding
 import ru.netology.nmedia.dto.Post
-import ru.netology.nmedia.utils.AndroidUtils
+import kotlin.Unit
 
 class MainActivity : AppCompatActivity() {
     private val viewModel by viewModels<PostViewModel>()
+    private lateinit var newPostLauncher: ActivityResultLauncher<Unit>
+    private lateinit var editPostLauncher: ActivityResultLauncher<Post>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,10 +40,10 @@ class MainActivity : AppCompatActivity() {
             )
             insets
         }
-
         val adapter = PostAdapter(object : PostListener {
             override fun onEdit(post: Post) {
                 viewModel.edit(post)
+                editPostLauncher.launch(post)
             }
 
             override fun likedById(post: Post) {
@@ -47,11 +51,31 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onShare(post: Post) {
+                val intent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    putExtra(Intent.EXTRA_TEXT, post.content)
+                    type = "text/plain"
+                }
+                val chooser = Intent.createChooser(intent, getString(R.string.chooser_share_post))
+                startActivity(chooser)
                 viewModel.shareById(post.id)
             }
 
             override fun onRemove(post: Post) {
                 viewModel.removeById(post.id)
+            }
+
+            override fun onVideoClick(videoUrl: String) {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(videoUrl))
+                try {
+                    startActivity(intent)
+                } catch (e: Exception) {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Не удалось открыть видео",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         })
 
@@ -63,36 +87,22 @@ class MainActivity : AppCompatActivity() {
         }
         viewModel.edited.observe(this) { post ->
             if (post.id == 0L) {
-                binding.editControls.visibility = View.GONE
-                binding.cancel.visibility = View.GONE
-                binding.editContent.setText("")
+
             } else {
-                binding.editControls.visibility = View.VISIBLE
-                binding.cancel.visibility = View.VISIBLE
-                with(binding.editContent) {
-                    setText(post.content)
-                    AndroidUtils.showKeyboard(this)
-                }
+
             }
         }
-
-        binding.save.setOnClickListener {
-            val currentText = binding.editContent.text?.trim().toString()
-            if (currentText.isBlank()) {
-                Toast.makeText(this, "Post content is empty!", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-            viewModel.save(currentText)
-
-            binding.editContent.setText("")
-            binding.editContent.clearFocus()
-            AndroidUtils.hideKeyBoard(binding.editContent)
+        newPostLauncher = registerForActivityResult(NewPostContract) { result ->
+            result ?: return@registerForActivityResult
+            viewModel.save(result)
         }
-        binding.cancel.setOnClickListener {
-            viewModel.cancelEdit()
-            binding.editContent.setText("")
-            binding.editContent.clearFocus()
-            AndroidUtils.hideKeyBoard(binding.editContent)
+        editPostLauncher = registerForActivityResult(EditPostContract) { result ->
+            result ?: return@registerForActivityResult
+            viewModel.save(result)
+        }
+
+        binding.add.setOnClickListener {
+            newPostLauncher.launch(Unit)
         }
     }
 }
