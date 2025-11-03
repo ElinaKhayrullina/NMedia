@@ -1,7 +1,11 @@
 package ru.netology.nmedia.adapter
 
+import android.content.Intent
+import android.net.Uri
 import android.view.View
+import android.view.ViewGroup
 import android.widget.PopupMenu
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.CardPostBinding
@@ -13,34 +17,51 @@ class PostViewHolder(
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(post: Post) {
-        with(binding) {
+        binding.apply {
             author.text = post.author
             published.text = post.published
-            content.text = post.content
 
+            val rutubeLink = extractRutubeLink(post.content)
+            val displayContent = if (rutubeLink != null) {
+                post.content.replace(rutubeLink, "").trim()
+            } else {
+                post.content
+            }
+            content.text = displayContent
+
+            if (rutubeLink == null) {
+                videoContainer.visibility = ViewGroup.GONE
+            } else {
+                videoContainer.visibility = ViewGroup.VISIBLE
+                videoThumbnail.setImageResource(R.drawable.video)
+                videoThumbnail.setOnClickListener {
+                    openVideo(rutubeLink)
+                }
+                videoPlayButton.setOnClickListener {
+                    openVideo(rutubeLink)
+                }
+            }
             if (post.countOfLikes > 0) {
                 favorite.text = formatNumbers(post.countOfLikes)
             } else {
                 favorite.text = ""
             }
-            favorite.visibility = View.VISIBLE
-
-            share.text = formatNumbers(post.countOfShare)
-            countOfVisibility.text = formatNumbers(post.countOfVisibility)
-
             favorite.isChecked = post.likedByMe
-
-            favorite.setOnClickListener {
-                listener.likedById(post)
+            if (post.countOfShare > 0) {
+                share.text = formatNumbers(post.countOfShare)
+            } else {
+                share.text = ""
             }
-
-            share.setOnClickListener {
-                listener.onShare(post)
+            if (post.countOfVisibility > 0) {
+                visibility.text = formatNumbers(post.countOfVisibility)
+                visibility.visibility = View.VISIBLE
+            } else {
+                visibility.visibility = View.GONE
             }
 
             menu.setOnClickListener {
                 PopupMenu(it.context, it).apply {
-                    inflate(R.menu.post_menu)
+                    inflate(R.menu.options_post)
                     setOnMenuItemClickListener { item ->
                         when (item.itemId) {
                             R.id.remove -> {
@@ -56,8 +77,30 @@ class PostViewHolder(
                             else -> false
                         }
                     }
-                }.show()
+                    show()
+                }
             }
+            favorite.setOnClickListener {
+                listener.likedById(post)
+            }
+            share.setOnClickListener {
+                listener.onShare(post)
+            }
+        }
+    }
+
+    private fun extractRutubeLink(content: String): String? {
+        val regex = "https://rutube\\.ru/video/[\\w\\-]+".toRegex()
+        return regex.find(content)?.value
+    }
+
+    private fun openVideo(videoUrl: String) {
+        try {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(videoUrl))
+            binding.root.context.startActivity(intent)
+        } catch (e: Exception) {
+            Toast.makeText(binding.root.context, "Не удалось открыть видео", Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
