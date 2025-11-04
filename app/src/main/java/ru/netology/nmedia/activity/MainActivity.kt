@@ -85,13 +85,10 @@ class MainActivity : AppCompatActivity() {
         viewModel.get().observe(this) { posts ->
             adapter.submitList(posts)
         }
+
         viewModel.edited.observe(this) { post ->
-            if (post.id == 0L) {
-
-            } else {
-
-            }
         }
+
         newPostLauncher = registerForActivityResult(NewPostContract) { result ->
             result ?: return@registerForActivityResult
             viewModel.save(result)
@@ -102,6 +99,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.add.setOnClickListener {
+            viewModel.edit(viewModel.empty())
             newPostLauncher.launch(Unit)
         }
     }
