@@ -35,10 +35,10 @@ class PostViewHolder(
                 videoContainer.visibility = ViewGroup.VISIBLE
                 videoThumbnail.setImageResource(R.drawable.video)
                 videoThumbnail.setOnClickListener {
-                    openVideo(rutubeLink)
+                    listener.onVideoClick(rutubeLink)
                 }
                 videoPlayButton.setOnClickListener {
-                    openVideo(rutubeLink)
+                    listener.onVideoClick(rutubeLink)
                 }
             }
             if (post.countOfLikes > 0) {
@@ -86,22 +86,18 @@ class PostViewHolder(
             share.setOnClickListener {
                 listener.onShare(post)
             }
+            favorite.setOnClickListener {
+                listener.likedById(post)
+            }
+            share.setOnClickListener {
+                listener.onShare(post)
+            }
         }
     }
 
     private fun extractRutubeLink(content: String): String? {
-        val regex = "https://rutube\\.ru/video/[\\w\\-]+".toRegex()
+        val regex = "https://rutube\\.ru/video/[\\w\\-]+/?".toRegex()
         return regex.find(content)?.value
-    }
-
-    private fun openVideo(videoUrl: String) {
-        try {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(videoUrl))
-            binding.root.context.startActivity(intent)
-        } catch (e: Exception) {
-            Toast.makeText(binding.root.context, "Не удалось открыть видео", Toast.LENGTH_SHORT)
-                .show()
-        }
     }
 
     private fun formatNumbers(count: Int): String {

@@ -1,7 +1,9 @@
 package ru.netology.nmedia.activity
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
@@ -21,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     private val viewModel by viewModels<PostViewModel>()
     private lateinit var newPostLauncher: ActivityResultLauncher<Unit>
     private lateinit var editPostLauncher: ActivityResultLauncher<Post>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding = ActivityMainBinding.inflate(layoutInflater)
@@ -55,10 +58,24 @@ class MainActivity : AppCompatActivity() {
                 }
                 val chooser = Intent.createChooser(intent, getString(R.string.chooser_share_post))
                 startActivity(chooser)
+                viewModel.shareById(post.id)
             }
 
             override fun onRemove(post: Post) {
                 viewModel.removeById(post.id)
+            }
+
+            override fun onVideoClick(videoUrl: String) {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(videoUrl))
+                try {
+                    startActivity(intent)
+                } catch (e: Exception) {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Не удалось открыть видео",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         })
 
@@ -75,7 +92,7 @@ class MainActivity : AppCompatActivity() {
 
             }
         }
-        val newPostLauncher = registerForActivityResult(NewPostContract) { result ->
+        newPostLauncher = registerForActivityResult(NewPostContract) { result ->
             result ?: return@registerForActivityResult
             viewModel.save(result)
         }
