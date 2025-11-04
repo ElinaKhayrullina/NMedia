@@ -27,6 +27,9 @@ class PostViewModel : ViewModel() {
         repository.likedById(id)
     }
 
+    fun empty() = Post(0, "", "", "", 0, 0, 0, false, "")
+
+
     fun shareById(id: Long) {
         repository.shareById(id)
     }
