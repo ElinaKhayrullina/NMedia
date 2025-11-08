@@ -1,11 +1,8 @@
 package ru.netology.nmedia.adapter
 
-import android.content.Intent
-import android.net.Uri
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.CardPostBinding
@@ -55,6 +52,7 @@ class PostViewHolder(
             if (post.countOfVisibility > 0) {
                 visibility.text = formatNumbers(post.countOfVisibility)
                 visibility.visibility = View.VISIBLE
+
             } else {
                 visibility.visibility = View.GONE
             }
