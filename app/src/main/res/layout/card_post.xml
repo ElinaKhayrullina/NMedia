@@ -5,13 +5,15 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="@dimen/common_spacing"
+    android:layout_marginTop="@dimen/common_spacing"
+    android:layout_marginBottom="@dimen/common_spacing"
     tools:context=".activity.MainActivity">
 
     <ImageView
         android:id="@+id/avatar"
         android:layout_width="@dimen/posts_avatar_size"
         android:layout_height="@dimen/posts_avatar_size"
+        android:layout_marginStart="4dp"
         android:layout_marginBottom="@dimen/common_spacing"
         android:contentDescription="@string/description_post_author_avatar"
         app:layout_constraintBottom_toBottomOf="@id/barrier"
@@ -122,6 +124,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/favorite"
+
             style="@style/Widget.App.LikeButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

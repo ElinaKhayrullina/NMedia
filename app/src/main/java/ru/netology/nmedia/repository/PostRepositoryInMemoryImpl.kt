@@ -1,23 +1,22 @@
 package ru.netology.nmedia.repository
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import ru.netology.nmedia.dto.Post
 
-class PostRepositoryInMemoryImp : PostRepository {
-    private var defaultPosts = List(100) { counter ->
-        Post(
-            id = counter + 1L,
-            author = "Нетология. Университет интернет-профессий будущего",
-            content = "Post #${counter} Привет, это новая Нетология! Когда-то Нетология начиналась с интенсивов по онлайн-маркетингу. Затем появились курсы по дизайну, разработке, аналитике и управлению. Мы растём сами и помогаем расти студентам: от новичков до уверенных профессионалов. Но самое важное остаётся с нами: мы верим, что в каждом уже есть сила, которая заставляет хотеть больше, целиться выше, бежать быстрее. Наша миссия — помочь встать на путь роста и начать цепочку перемен → http://netolo.gy/fyb",
-            published = "22 мая в 18:36",
-            countOfLikes = 0,
-            countOfShare = 100,
-            countOfVisibility = 1_300_000
-        )
-    }
-    private var nextId = defaultPosts.size.toLong() + 1
+class PostRepositoryFiles(private val context: Context) : PostRepository {
+
+    private var defaultPosts = readPosts()
+        set(value) {
+            field = value
+            sync()
+        }
+
     private val data = MutableLiveData(defaultPosts)
+    private var nextId = defaultPosts.size.toLong() + 1
 
     override fun get(): LiveData<List<Post>> = data
 
@@ -50,8 +49,11 @@ class PostRepositoryInMemoryImp : PostRepository {
 
     override fun removeById(id: Long) {
         val currentPosts = data.value.orEmpty()
-        data.value = currentPosts.filter { it.id != id }
+        val newList = currentPosts.filter { it.id != id }
+        data.value = newList
+        defaultPosts = newList
     }
+
 
     override fun save(post: Post) {
         if (post.id == 0L) {
@@ -61,11 +63,45 @@ class PostRepositoryInMemoryImp : PostRepository {
                 likedByMe = false,
                 published = "now"
             )
-            data.value = listOf(newPost) + data.value.orEmpty()
+            val newList = listOf(newPost) + data.value.orEmpty()
+            data.value = newList
+            defaultPosts = newList
             return
         }
-        data.value = data.value.orEmpty().map {
+        val newList = data.value.orEmpty().map {
             if (it.id != post.id) it else it.copy(content = post.content)
         }
+        data.value = newList
+        defaultPosts = newList
+    }
+
+    private fun sync() {
+        context.openFileOutput(KEY_FILE, Context.MODE_PRIVATE).bufferedWriter().use {
+            it.write(gson.toJson(defaultPosts))
+        }
+    }
+
+    private fun readPosts(): List<Post> {
+        val file = context.filesDir.resolve(KEY_FILE)
+        return if (file.exists()) {
+            context.openFileInput(KEY_FILE).bufferedReader().use {
+                gson.fromJson(it, type)
+            }
+        } else {
+            emptyList()
+        }
+    }
+
+    private fun writePosts(posts: List<Post>) {
+        val file = context.filesDir.resolve(KEY_FILE)
+        file.writeText(gson.toJson(posts))
+    }
+
+    companion object {
+        private const val KEY_FILE = "posts.json"
+
+        private val gson = Gson()
+        private val type = TypeToken.getParameterized(List::class.java, Post::class.java).type
     }
 }
+

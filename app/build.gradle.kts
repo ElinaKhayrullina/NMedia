@@ -54,6 +54,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.android)
     implementation(libs.generativeai)
     implementation(libs.firebase.ai)
+    implementation(libs.gson)
     implementation(libs.firebase.vertexai)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
