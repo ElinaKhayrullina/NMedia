@@ -16,7 +16,7 @@ class PostRepositoryFiles(private val context: Context) : PostRepository {
         }
 
     private val data = MutableLiveData(defaultPosts)
-    private var nextId = defaultPosts.size.toLong() + 1
+    private var nextId = (defaultPosts.maxByOrNull { it.id }?.id ?: 0L) + 1
 
     override fun get(): LiveData<List<Post>> = data
 
