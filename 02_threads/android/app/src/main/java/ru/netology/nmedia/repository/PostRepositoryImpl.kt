@@ -35,8 +35,34 @@ class PostRepositoryImpl: PostRepository {
             }
     }
 
-    override fun likeById(id: Long) {
-        // TODO: do this in homework
+    override fun likeById(id: Long): Post {
+        val posts = getAll()
+        val currentPost = posts.find { it.id == id }
+            ?: throw RuntimeException("Post with id $id not found")
+
+        val request = if (currentPost.likedByMe) {
+            Request.Builder()
+                .delete()
+                .url("${BASE_URL}/api/slow/posts/$id/likes")
+                .build()
+        } else {
+            Request.Builder()
+                .post("".toRequestBody())
+                .url("${BASE_URL}/api/slow/posts/$id/likes")
+                .build()
+        }
+        
+        return client.newCall(request)
+            .execute()
+            .let { response ->
+                if (!response.isSuccessful) {
+                    throw RuntimeException("Request failed with code ${response.code}")
+                }
+                response.body?.string() ?: throw RuntimeException("Response body is null")
+            }
+            .let { responseBody ->
+                gson.fromJson(responseBody, Post::class.java)
+            }
     }
 
     override fun save(post: Post) {
