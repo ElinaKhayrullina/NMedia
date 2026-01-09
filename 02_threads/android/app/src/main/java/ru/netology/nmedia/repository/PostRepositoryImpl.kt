@@ -35,20 +35,16 @@ class PostRepositoryImpl: PostRepository {
             }
     }
 
-    override fun likeById(id: Long): Post {
-        val posts = getAll()
-        val currentPost = posts.find { it.id == id }
-            ?: throw RuntimeException("Post with id $id not found")
-
-        val request = if (currentPost.likedByMe) {
+    override fun likeById(post: Post): Post {
+        val request = if (post.likedByMe) {
             Request.Builder()
                 .delete()
-                .url("${BASE_URL}/api/slow/posts/$id/likes")
+                .url("${BASE_URL}/api/slow/posts/${post.id}/likes")
                 .build()
         } else {
             Request.Builder()
                 .post("".toRequestBody())
-                .url("${BASE_URL}/api/slow/posts/$id/likes")
+                .url("${BASE_URL}/api/slow/posts/${post.id}/likes")
                 .build()
         }
         
