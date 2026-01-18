@@ -67,8 +67,15 @@ class PostRepositoryImpl : PostRepository {
             .build()
 
         client.newCall(request)
-            .execute()
-            .close()
+            .enqueue(object : Callback {
+                override fun onResponse(call: Call, response: Response) {
+                    response.close()
+                }
+
+                override fun onFailure(call: Call, e: IOException) {
+                    // Handle error if needed
+                }
+            })
     }
 
     override fun removeById(id: Long) {
@@ -78,7 +85,14 @@ class PostRepositoryImpl : PostRepository {
             .build()
 
         client.newCall(request)
-            .execute()
-            .close()
+            .enqueue(object : Callback {
+                override fun onResponse(call: Call, response: Response) {
+                    response.close()
+                }
+
+                override fun onFailure(call: Call, e: IOException) {
+                    // Handle error if needed
+                }
+            })
     }
 }
