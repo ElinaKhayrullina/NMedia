@@ -17,8 +17,10 @@ class PostRepositoryFiles(private val context: Context) : PostRepository {
 
     private val data = MutableLiveData(defaultPosts)
     private var nextId = (defaultPosts.maxByOrNull { it.id }?.id ?: 0L) + 1
+    override fun get(): List<Post> {
+        TODO("Not yet implemented")
+    }
 
-    override fun get(): LiveData<List<Post>> = data
 
     override fun likedById(id: Long) {
         val posts = data.value.orEmpty()
