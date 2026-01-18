@@ -82,9 +82,7 @@ class MainActivity : AppCompatActivity() {
         binding.container.layoutManager = LinearLayoutManager(this)
         binding.container.adapter = adapter
 
-        viewModel.get().observe(this) { posts ->
-            adapter.submitList(posts)
-        }
+        adapter.submitList(viewModel.get())
 
         viewModel.edited.observe(this) { post ->
         }

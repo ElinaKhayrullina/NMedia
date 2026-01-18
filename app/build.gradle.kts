@@ -28,6 +28,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            manifestPlaceholders["usesCleartextTraffic"]= false
+        }
+        debug {
+            manifestPlaceholders["usesCleartextTraffic"]= true
         }
     }
 
@@ -55,6 +59,7 @@ dependencies {
     implementation(libs.generativeai)
     implementation(libs.firebase.ai)
     implementation(libs.gson)
+    implementation(libs.okhttp)
     implementation(libs.firebase.vertexai)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
