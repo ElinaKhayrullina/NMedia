@@ -1,0 +1,16 @@
+plugins {
+    kotlin("jvm") version "2.2.20"
+}
+
+group = "ru.netology"
+version = "1.0-SNAPSHOT"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation(kotlin("stdlib"))
+    implementation("com.squareup.okhttp3:okhttp:5.3.2")
+    implementation("com.google.code.gson:gson:2.13.1")
+}
