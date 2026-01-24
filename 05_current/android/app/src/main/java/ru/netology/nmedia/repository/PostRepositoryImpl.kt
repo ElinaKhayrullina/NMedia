@@ -46,6 +46,28 @@ class PostRepositoryImpl : PostRepository {
         })
     }
 
+    override fun dislikeByIdAsync(id: Long, callback: PostRepository.PostCallback) {
+        PostsApi.retrofitService.dislikeById(id).enqueue(object : Callback<Post> {
+            override fun onResponse(call: Call<Post>, response: Response<Post>) {
+                if (!response.isSuccessful) {
+                    callback.onError(Exception("Что-то пошло не так, повторите запрос позже"))
+                    return
+                }
+
+                val post = response.body()
+                if (post != null) {
+                    callback.onSuccess(post)
+                } else {
+                    callback.onError(Exception("Что-то пошло не так, повторите запрос позже"))
+                }
+            }
+
+            override fun onFailure(call: Call<Post>, t: Throwable) {
+                callback.onError(Exception("Что-то пошло не так, повторите запрос позже"))
+            }
+        })
+    }
+
     override fun saveAsync(post: Post, callback: PostRepository.PostCallback) {
         PostsApi.retrofitService.save(post).enqueue(object : Callback<Post> {
             override fun onResponse(call: Call<Post>, response: Response<Post>) {

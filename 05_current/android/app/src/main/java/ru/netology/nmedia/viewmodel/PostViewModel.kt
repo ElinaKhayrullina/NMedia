@@ -90,19 +90,22 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     fun likeById(id: Long) {
         val old = _data.value?.posts.orEmpty()
-        val updatedPosts = old.map { post ->
-            if (post.id == id) {
-                post.copy(
-                    likedByMe = !post.likedByMe,
-                    likes = if (post.likedByMe) post.likes - 1 else post.likes + 1
+        val post = old.find { it.id == id } ?: return
+        val wasLiked = post.likedByMe
+
+        val updatedPosts = old.map { currentPost ->
+            if (currentPost.id == id) {
+                currentPost.copy(
+                    likedByMe = !currentPost.likedByMe,
+                    likes = if (currentPost.likedByMe) currentPost.likes - 1 else currentPost.likes + 1
                 )
             } else {
-                post
+                currentPost
             }
         }
         _data.postValue(_data.value?.copy(posts = updatedPosts))
 
-        repository.likeByIdAsync(id, object : PostRepository.PostCallback {
+        val callback = object : PostRepository.PostCallback {
             override fun onSuccess(post: Post) {
                 val currentPosts = _data.value?.posts.orEmpty().map { currentPost ->
                     if (currentPost.id == post.id) post else currentPost
@@ -114,7 +117,13 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                 _data.postValue(_data.value?.copy(posts = old, error = true))
                 _errorEvent.postValue(e.message ?: "Что-то пошло не так, повторите запрос позже")
             }
-        })
+        }
+
+        if (wasLiked) {
+            repository.dislikeByIdAsync(id, callback)
+        } else {
+            repository.likeByIdAsync(id, callback)
+        }
     }
 
     fun removeById(id: Long) {
