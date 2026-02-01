@@ -1,0 +1,44 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+plugins {
+    id("org.springframework.boot") version "3.5.5"
+    id("io.spring.dependency-management") version "1.1.7"
+    id("org.jetbrains.kotlin.plugin.jpa") version "2.2.20"
+    kotlin("jvm") version "2.2.10"
+    kotlin("plugin.spring") version "2.2.20"
+}
+
+group = "ru.netology"
+version = "0.0.1-SNAPSHOT"
+java.sourceCompatibility = JavaVersion.VERSION_17
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("com.github.javafaker:javafaker:1.0.2") {
+        exclude(module = "snakeyaml")
+    }
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    
+    runtimeOnly("com.h2database:h2")
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
+    }
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
+}
+
+tasks.withType<KotlinCompile> {
+    compilerOptions {
+        freeCompilerArgs.addAll("-Xjsr305=strict")
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        languageVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9)
+    }
+}
